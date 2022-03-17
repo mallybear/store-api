@@ -1,0 +1,123 @@
+Imagine we are in charge of a store API, and we want to provide a bunch of search 
+options for our users (search by name, fitlering based on price amount, etc).
+
+No front-end for this project.
+
+Project Objectives
+- Advanced filtering and sorting
+- Dynaically populating a database
+
+NOTE: to kill a process currently using a port (Windows)
+- netstat -ano | findstr :<PORT>
+- taskkill /PID <PID> /F
+
+NOTE: to kill a process if you have npm@5.2.0^
+- npx kill-port <PORT>
+
+1. Run npm install to install dependencies
+
+2. Set up regular files:
+
+    app.js
+    middleware/error-handler.js
+    middleware/ not-found.js
+    db/connect.js
+    
+    We will build the following folders:
+    controllers/
+    models/
+    routes/
+
+3.  Require dotenv in app.js to gain access to the environment variables. Will create .env file once we start connecting to the database.
+
+    require('dotenv').config()
+
+4. Require regualr moduleas and invoke express
+
+    require('express-async-errors')
+    const express = require('express')
+    const connectDB = require('./db/connect')
+    const notFound = require('./middleware/not-found')
+    const errorHandlerMiddleware = require('./middleware/error-handler')
+
+5. Create dummy home rotue
+
+    app.get('/', (req,res) => {
+    res.send('<h1>Store API</h1><a href="/api/v1/prodcuts">products route</a>')
+    })
+
+6. Import following middleware functions:
+
+    app.use(express.json())
+    app.use(notFound)
+    app.use(errorHandlerMiddleware)
+
+7. Create port for server and server try-catch block.
+
+    const port = process.env.PORT || 3000
+
+    const start = async () => {
+    try {
+        //connectDB
+        await connectDB(process.env.MONGO_URI)
+        app.listen(port, console.log(`Server is listening on port ${port}...`))
+    } catch (error) {
+        console.log(error)
+    }
+    }
+
+    start()
+
+8. Connect to database.
+
+    - Go to MongoDB Atlas
+    - Connections
+    - Copy connection string
+    - Go to project and create .env file
+    - Create MONG_URI and paste string in .env file and modify passowrd and database name
+    - Restart server
+
+9. Set up dummy route in controller, route, then app.js:
+
+    const getAllProductsStatic = async (req,res) => {
+    res.status(200).json({msg:'products testing route'})
+    }
+
+    const {getAllProducts, getAllProductsStatic} = require('../controllers/products')
+
+    router.route('/static').get(getAllProductsStatic)
+
+    const productsRouter = require('./routes/products')
+
+    app.use('/api/v1/products', productsRouter)
+
+10. Test dummy route and check express-async-errors working in Postman
+
+11. Need to create a mongoose schema for our data in the model
+
+12. Populate our database with data from products.json using populate.js
+
+    - make sure to stop server and run node populate.js
+    - make sure to clear all products already in database then create
+
+13. Import models/product.js into controller
+
+14. Hardcode a filtered product GET request in controllers/products.js and test in Postman
+
+15. Set up dynamic filtering in Postman and test
+
+    - can hardcode console.log(req.query) in controller to see results in terminal
+    - then use const { featured, company, name } = req.query
+
+16. Implement regex
+
+17. Implement sorting
+
+    NOTE: need to use escape \ before negative sign for reverse sort
+
+18. Implement filter by fields
+
+19. Implement numeric filters
+
+
+
